@@ -1,21 +1,25 @@
-FROM nginx
+FROM nginx:latest
 
-WORKDIR /root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends unzip wget \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt update && apt install git unzip wget -y && rm -rf /var/lib/apt/lists/*
-
-COPY ./nginx/conf.d/upstreams.conf /etc/nginx/conf.d/upstreams.conf
-COPY ./nginx/conf.d/common_vars.conf /etc/nginx/conf.d/common_vars.conf
-COPY ./nginx/mainsail /etc/nginx/sites-available/mainsail
-
-RUN mkdir -p /root/mainsail
-RUN rm -f /etc/nginx/sites-enabled/default
+# Remove the official image's default virtual host
 RUN rm -f /etc/nginx/conf.d/default.conf
 
-RUN mkdir -p /etc/nginx/sites-enabled/
-RUN ln -s /etc/nginx/sites-available/mainsail /etc/nginx/sites-enabled/
+# This must be a .conf file inside conf.d
+COPY ./nginx/conf.d/common_vars.conf /etc/nginx/conf.d/common_vars.conf
+COPY ./nginx/conf.d/upstreams.conf /etc/nginx/conf.d/upstreams.conf
+COPY ./nginx/mainsail /etc/nginx/conf.d/mainsail.conf
 
-RUN wget -q -O mainsail.zip https://github.com/mainsail-crew/mainsail/releases/latest/download/mainsail.zip && unzip mainsail.zip -d /root/mainsail/ && rm mainsail.zip
+RUN rm -rf /usr/share/nginx/html/* \
+    && wget -q -O /tmp/mainsail.zip \
+       https://github.com/mainsail-crew/mainsail/releases/latest/download/mainsail.zip \
+    && unzip -oq /tmp/mainsail.zip -d /usr/share/nginx/html \
+    && rm -f /tmp/mainsail.zip \
+    && test -f /usr/share/nginx/html/index.html
+
+RUN nginx -t
 
 EXPOSE 80
 
