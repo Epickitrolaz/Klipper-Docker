@@ -1,0 +1,8 @@
+services:
+  mainsail:
+    build:
+      context: ./mainsail
+      dockerfile: mainsail.Dockerfile
+    ports:
+      - 80:80
+    restart: always
