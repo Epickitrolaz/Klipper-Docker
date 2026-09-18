@@ -5,4 +5,21 @@ services:
       dockerfile: mainsail.Dockerfile
     ports:
       - 80:80
+    networks:
+      - mainsail
     restart: always
+
+  moonraker:
+    build:
+      context: ./moonraker
+      dockerfile: moonraker.Dockerfile
+    ports:
+      - 7125:7125
+    networks:
+      - mainsail
+    volumes:
+      - /opt/printer_data:/root/printer_data:z
+    restart: always
+
+networks:
+  mainsail:
