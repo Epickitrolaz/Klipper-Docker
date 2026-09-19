@@ -8,6 +8,10 @@ RUN apt-get update \
 
 RUN cd /root && git clone https://github.com/Arksine/moonraker.git --depth 1
 
+# Install moonraker-timelapse
+RUN cd /root && git clone https://github.com/mainsail-crew/moonraker-timelapse.git
+RUN ln -sf /root/moonraker-timelapse/component/timelapse.py /root/moonraker/moonraker/components/timelapse.py
+
 RUN python3 -m venv /root/moonraker-env && /root/moonraker-env/bin/python3 -m pip install -r /root/moonraker/scripts/moonraker-requirements.txt
 
 RUN mkdir /root/printer_data
