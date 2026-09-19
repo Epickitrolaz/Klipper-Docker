@@ -42,5 +42,33 @@ services:
     user: 0:0
     restart: always
 
+  crowsnest:
+    build:
+      context: ./crowsnest
+      dockerfile: crowsnest.Dockerfile
+    ports:
+      - 8080:8080
+      - 8081:8081
+      - 8082:8082
+      - 8083:8083
+    volumes:
+      - /opt/printer_data:/root/printer_data:z
+      - /dev/v4l:/dev/v4l:ro
+      - /dev/bus/usb:/dev/bus/usb:ro
+    networks:
+      - mainsail
+
+    devices:
+      - ${CAMERA_1_DEVICE}:/dev/video0
+      - ${CAMERA_2_DEVICE}:/dev/video1
+      - ${CAMERA_3_DEVICE}:/dev/video2
+      - ${CAMERA_4_DEVICE}:/dev/video3
+
+    security_opt:
+      - label=disable
+    privileged: true
+    user: 0:0
+    restart: always
+
 networks:
   mainsail:
